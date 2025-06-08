@@ -9,7 +9,12 @@ except ImportError:
 import streamlit as st
 
 # Excel-Vorlage Download-Block
-st.markdown("### 📥 Excel-Vorlage herunterladen")
+st.title("Excel-Vorlage herunterladen")
+st.write("Diese Excel-Tabelle kann heruntergeladen werden, um sie zu befüllen und anschließend im t-cruncher hochzuladen.")
+st.write("Eine Excel-Tabelle ist für die meisten User angenehmer, als eine CSV-Datei zu erstellen oder die Werte manuell"
+         " in das Textfeld einzutippen.")
+st.write("Bitte achte darauf, die Tabelle nicht zu verändern oder zu formatieren, sondern nur zu befüllen.")
+st.write("Klicke den Button, um die Tabelle herunterzuladen.")
 if not pandas_xlsxwriter_available:
     st.warning(
         "Bitte installiere die benötigten Pakete für den Excel-Export:\n\n"
