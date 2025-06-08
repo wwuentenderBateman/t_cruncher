@@ -6,23 +6,35 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 
-st.title("One-Sample T-Test Calculator")
+st.title("one-sample t-test calculator")
 
 # Eingaben
-uploaded_file = st.file_uploader("CSV-Datei hochladen oder manuell eingeben", type=["csv"])
+uploaded_file = st.file_uploader("CSV- oder Excel-Datei hochladen oder manuell eingeben", type=["csv", "xlsx"], key="csv_or_excel_upload_tcruncher")
 data_input = st.text_area("Oder gib deine Stichprobe manuell ein (z. B. 230, 245, 240):")
 hypo_mean = st.number_input("Erwarteter Mittelwert (μ)", value=250.0)
 alpha = st.number_input("Signifikanzniveau (α)", min_value=0.001, max_value=0.5, value=0.05, step=0.01, format="%.3f")
 tail = st.selectbox("Testart", ["zweiseitig", "einseitig größer", "einseitig kleiner"])
 
 # Datenverarbeitung
+import os
 data = None
 if uploaded_file:
     try:
-        df_csv = pd.read_csv(uploaded_file, header=None)
-        data = df_csv.values.flatten()
-    except:
-        st.warning("⚠️ Konnte CSV-Datei nicht lesen.")
+        filename = uploaded_file.name
+        ext = os.path.splitext(filename)[1].lower()
+
+        if ext == ".csv":
+            df_csv = pd.read_csv(uploaded_file, header=None)
+        elif ext == ".xlsx":
+            df_csv = pd.read_excel(uploaded_file, header=None, engine="openpyxl")
+        else:
+            st.warning("❌ Nicht unterstützter Dateityp.")
+            df_csv = None
+
+        if df_csv is not None:
+            data = pd.to_numeric(df_csv.iloc[:, 0], errors='coerce').dropna().to_numpy()
+    except Exception as e:
+        st.warning(f"⚠️ Fehler beim Einlesen: {e}")
 elif data_input:
     try:
         data = np.array([float(x.strip()) for x in data_input.split(",")])
